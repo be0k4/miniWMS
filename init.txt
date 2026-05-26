@@ -1,0 +1,18 @@
+#nodejs#
+nvm ls
+nvm install 22
+nvm alias default 22
+nvm use 22
+node -v
+
+#clientフォルダ初期化#
+# vite, react, typescript 
+#npm initは省略可
+npm create vite@latest client -- --template react-ts
+#MUI関連, x-data-grid(超重要)
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material @mui/x-data-grid
+
+#serverフォルダ初期化#
+#nestjs/cliは、nestコマンドでフォルダを初期化したり、ファイルを自動生成したりするツール
+npm install -g @nestjs/cli
+nest new server

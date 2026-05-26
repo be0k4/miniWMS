@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: wms-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: wms_user
+      POSTGRES_PASSWORD: wms_password
+      POSTGRES_DB: mini_wms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
