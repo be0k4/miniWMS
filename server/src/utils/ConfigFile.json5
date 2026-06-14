@@ -1,0 +1,49 @@
+{
+  database: {
+    host: '',
+    user: '',
+    password: '',
+    role: '',
+    databases: {
+      default: '',
+    },
+    port: 5433,
+    rejectUnauthorized: "'true' または 'false' にすると適用されます",
+  },
+  print: {
+    AAA: {
+      '001': {
+        path: '',
+        exe: 'A.exe',
+        enabledWriter: false,
+        print_step_url: '',
+      },
+    },
+  },
+  // Loggingでログ出力を行うため、pathはLoggingからみた相対パスで指定もしくは、絶対パスで指定
+  log: {
+    path: './log',
+    rotatePeriod: 7,
+  },
+  export: {
+    excel: {
+      outputPath: './export',
+      templatePath: './template',
+    },
+  },
+  write: {
+    file: {
+      templatePath: './template',
+    },
+  },
+  agent: {
+    AAA: {
+      searchInputCd: false,
+      replaceSku: false,
+    },
+  },
+  image: {
+    path: '/../image',
+    prefix: '/image/',
+  },
+}
