@@ -1,9 +1,9 @@
 import { promises } from 'fs';
 import { schedule } from 'node-cron';
 import { join } from 'path';
-import Config from './Config';
-import { toJapaneseString } from './DateUtils';
-import { WMSRequest } from 'src/type/WMSRequest';
+import Config from './config';
+import { toJapaneseString } from './dateUtils';
+import { WmsRequest } from 'src/type/wms-request';
 Error.stackTraceLimit = 30;
 
 /**
@@ -16,7 +16,7 @@ export default class Logging {
 
   // ログの書き込み
   private static async writeLog(
-    req: WMSRequest,
+    req: WmsRequest,
     message: string,
     level: 'DEBUG' | 'ERROR',
   ): Promise<void> {
@@ -47,14 +47,14 @@ export default class Logging {
    * デバックログを出力する
    * @param message 出力するログ
    */
-  static async debugLog(req: WMSRequest, message: string): Promise<void> {
+  static async debugLog(req: WmsRequest, message: string): Promise<void> {
     await Logging.writeLog(req, message, 'DEBUG');
   }
   /**
    * エラーログを出力する
    * @param message 発生した例外
    */
-  static async errorLog(req: WMSRequest, message: string): Promise<void> {
+  static async errorLog(req: WmsRequest, message: string): Promise<void> {
     await Logging.writeLog(req, message, 'ERROR');
   }
 

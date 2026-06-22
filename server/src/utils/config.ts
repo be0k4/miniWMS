@@ -52,7 +52,7 @@ export interface Image {
  */
 export default class Config {
   static #config: Record<string, unknown> = JSON5.parse(
-    readFileSync(__dirname + '/ConfigFile.json5').toString(),
+    readFileSync(__dirname + '/configFile.json5').toString(),
   );
 
   /**

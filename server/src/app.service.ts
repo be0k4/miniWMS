@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { toJapaneseString } from './utils/dateUtils';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getHealth() {
+    return {
+      status: 'ok',
+      timestamp: toJapaneseString(new Date(), true),
+    };
   }
 }

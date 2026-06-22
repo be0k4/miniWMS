@@ -8,9 +8,9 @@ import { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './logging.interceptor';
 import fastifyStatic from '@fastify/static';
-import LX7Config from './utils/Config';
+import Config from './utils/config';
 import * as fs from 'fs';
-import Logging from './utils/Logging';
+import Logging from './utils/logging';
 
 const portNo = Number.isNaN(Number(process.argv[2]))
   ? 30001
@@ -37,7 +37,7 @@ async function bootstrap() {
     fastifyadapter,
   );
   // 静的ファイルの提供設定
-  const imageConfig = LX7Config.getImageSetting();
+  const imageConfig = Config.getImageSetting();
   app.register(fastifyStatic, {
     root: __dirname + imageConfig.path,
     prefix: imageConfig.prefix,
