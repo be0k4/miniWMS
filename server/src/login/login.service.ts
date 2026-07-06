@@ -1,0 +1,58 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
+import { verifyPassword } from 'src/login/crypto';
+import { LoginRepository, LoginUserInfo } from './login.repository';
+import { LoginPostRequestParameter } from './login.controller';
+
+@Injectable()
+export class LoginService {
+  historyRepository: any;
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly loginRepository: LoginRepository,
+  ) {}
+
+  async tryLogin(
+    req: any,
+    body: LoginPostRequestParameter,
+  ): Promise<
+    | {
+        result: true;
+        user: { user_id: string };
+        token: { accessToken: string; refreshToken: string };
+      }
+    | { result: false }
+  > {
+    const stored = await this.loginRepository.getHashedPassword(
+      req,
+      body.user_id,
+      body.whs_cd,
+      body.agent_cd,
+    );
+    const canLogin = await verifyPassword(stored.password, body.password);
+
+    if (!canLogin) {
+      return { result: false };
+    }
+    const user = await this.loginRepository.getUser(
+      req,
+      stored.userId,
+      body.whs_cd,
+      body.agent_cd,
+    );
+    const token = await this.authService.generateAccessToken(
+      stored.userId,
+      user.agent_cd,
+      user.whs_cd,
+    );
+    return {
+      result: true,
+      user,
+      token,
+    };
+  }
+  catch(e: any) {
+    throw e;
+  }
+}

@@ -3,12 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRepository } from './jwt-repository';
-import { OneTimeTokenRepository } from './one-time-token-repository';
+import { OneTimeTokenRepository } from './one-time-token.repository';
 import { AuthService } from './auth.service';
 import { TokenBlacklistService } from './token-blacklist-service';
 import { JwtStrategy, OneTimeTokenStrategy } from './jwt.strategy';
 import { JwtAuthGuard, OneTimeTokenAuthGuard } from './jwt-auth.guard';
-// import { LocalStrategy } from './local.strategy';
 import { AuthController } from './auth.controller';
 @Module({
   imports: [
@@ -44,7 +43,16 @@ import { AuthController } from './auth.controller';
     TokenBlacklistService,
   ],
 
-  // exportsにより別のmoduleからAuthServiceを使用可能にする
-  exports: [AuthService],
+  // exportsにより別のmoduleからでも、関連する機能をすべて利用可能にする
+  exports: [
+    AuthService,
+    'oneTimeTokenRepository',
+    OneTimeTokenStrategy,
+    OneTimeTokenAuthGuard,
+    'jwtRepository',
+    JwtStrategy,
+    JwtAuthGuard,
+    TokenBlacklistService,
+  ],
 })
 export class AuthModule {}

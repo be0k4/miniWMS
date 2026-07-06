@@ -1,0 +1,94 @@
+import { Injectable } from '@nestjs/common';
+import DBUtils from 'src/utils/db-utils';
+import argon2 from 'argon2';
+
+export type LoginUserInfo = {
+  user_id: string;
+  user_nm: string;
+  agent_cd: string;
+  agent_nm: string;
+  whs_cd: string;
+  whs_nm: string;
+  menu_grp_cd: string[];
+  user_grp_cd: string;
+};
+
+@Injectable()
+export class LoginRepository {
+  constructor(private readonly db: DBUtils) {}
+
+  /**
+   * argon2でハッシュ化されたパスワードを取得する
+   */
+  async getHashedPassword(
+    req: any,
+    user_id: string,
+    whs_cd: string,
+    agent_cd: string,
+  ): Promise<{ userId: string; password: string }> {
+    const sql = `
+        SELECT  user_profile_cd as userid
+            ,   pass_word as password
+        FROM    user_profile
+        WHERE   user_profile_cd = $1
+        `;
+    // RLS用にuserInfoを設定
+    // ログイン時にはJWTAuthGuardがまだ実行されていないため
+    req.userInfo = { user_id, whs_cd, agent_cd };
+    const res = await this.db.execQuery<{
+      userid: string;
+      password: string;
+    }>(req, sql, [user_id]);
+    if (res.length === 0) return { userId: '', password: '' };
+    return {
+      userId: res[0].userid,
+      password: res[0].password,
+    };
+  }
+
+  async getUser(
+    req: any,
+    user_id: string,
+    whs_cd: string,
+    agent_cd: string,
+  ): Promise<LoginUserInfo> {
+    const sql = `
+        SELECT  u.user_profile_cd as user_id
+            ,   u.user_nm
+            ,   u.agent_cd
+            ,   a.agent_nm
+            ,   u.whs_cd
+            ,   u.whs_nm
+            ,   u.user_grp_cd
+            ,   array_agg(m.menu_grp_cd) as menu_grp_cd
+        FROM user_profile u 
+        JOIN menu_grp m ON m.user_grp_cd = u.user_grp_cd
+        JOIN agent a ON a.agent_cd = u.agent_cd
+        WHERE u.user_profile_cd = $1
+        GROUP BY
+                u.user_profile_cd
+            ,   u.user_nm
+            ,   u.agent_cd
+            ,   a.agent_nm
+            ,   u.whs_cd
+            ,   u.whs_nm
+            ,   u.user_grp_cd
+        `;
+    // RLS用にuserInfoを設定
+    // ログイン時にはJWTAuthGuardがまだ実行されていないため
+    if (!req.userInfo) req.userInfo = { user_id, whs_cd, agent_cd };
+    const res = await this.db.execQuery<LoginUserInfo>(req, sql, [user_id]);
+    return res[0];
+  }
+
+  hashPassword = async (password: string): Promise<string> => {
+    return await argon2.hash(password, { type: argon2.argon2id });
+  };
+
+  verifyPassword = async (
+    storedHash: string,
+    password: string,
+  ): Promise<boolean> => {
+    return await argon2.verify(storedHash, password);
+  };
+}

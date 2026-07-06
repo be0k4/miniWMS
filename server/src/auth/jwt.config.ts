@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-// 取得時はConfigService.get('jwt')でアクセス可能
+// 取得時はConfigService.get('jwt.~')でアクセス可能
 export default registerAs('jwt', () => ({
   // 機密情報はセキュリティの観点から、コードベースに記述しない
   secret: process.env.JWT_SECRET,

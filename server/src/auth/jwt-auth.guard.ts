@@ -34,8 +34,13 @@ class JwtAuthGuard extends AuthGuard('jwt') {
       console.log('reject');
       throw new UnauthorizedException();
     }
-    // user情報（JWTペイロード）をリクエストオブジェクトに付与
-    request.userInfo = user;
+    const userInfo = {
+      user_id: user.userId,
+      whs_cd: user.whsCd,
+      agent_cd: user.agentCd,
+    };
+    // user情報(RLS用)をリクエストオブジェクトに付与
+    request.userInfo = userInfo;
     return request;
   }
 }
@@ -43,9 +48,12 @@ class JwtAuthGuard extends AuthGuard('jwt') {
 @Injectable()
 class OneTimeTokenAuthGuard extends AuthGuard('ott') {}
 
-/*
-    ガード内で検証したユーザー情報をリクエストから取得する
-*/
+/**
+ * リクエストのuserInfoを取得するためのデコレーター
+ * @param property 取得したいプロパティ名（省略可）
+ * @param context ExecutionContext
+ * @returns userInfoオブジェクトまたは指定したプロパティの値
+ */
 const GuardResponse = createParamDecorator(
   (property: string, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
