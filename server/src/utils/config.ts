@@ -1,18 +1,4 @@
 import { readFileSync } from 'fs';
-import JSON5 from 'json5';
-
-export interface DbConfigResult {
-  host: string;
-  user: string;
-  password: string;
-  role: string;
-  databases: {
-    [agentCd: string]: string;
-    default: string;
-  };
-  port: number;
-  rejectUnauthorized: string;
-}
 
 export interface PrintSetting {
   path: string;
@@ -51,29 +37,9 @@ export interface Image {
  * 設定ファイル
  */
 export default class Config {
-  static #config: Record<string, unknown> = JSON5.parse(
-    readFileSync(__dirname + '/configFile.json5').toString(),
+  static #config: Record<string, unknown> = JSON.parse(
+    readFileSync(__dirname + '/configFile.json').toString(),
   );
-
-  /**
-   * 設定ファイルからDB接続情報を取得する
-   */
-  static getDatabase(): DbConfigResult {
-    const database = Config.#config['database'] as DbConfigResult;
-    const dbConfigResult: DbConfigResult = {
-      ...database,
-    };
-    return dbConfigResult;
-  }
-
-  // static #printSetting: PrintSetting;
-  // static getPrintSetting(): PrintSetting {
-  //   if (!this.#printSetting) {
-  //     const print = JSON.parse(Config.#jsonString)['print'];
-  //     this.#printSetting = print;
-  //   }
-  //   return this.#printSetting;
-  // }
 
   static #logSetting: LogSetting;
   static getLogSetting(): LogSetting {

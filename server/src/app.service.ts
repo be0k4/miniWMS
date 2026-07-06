@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { toJapaneseString } from './utils/dateUtils';
+import { toJapaneseString } from './utils/date-utils';
 
 @Injectable()
 export class AppService {

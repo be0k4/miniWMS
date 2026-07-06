@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { LoginModule } from './login/login.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import jwtConfig from './auth/jwt.config';
+import dbConfig from './utils/db.config';
 
 // ルートモジュール
 // ここからモジュールを読み込んでいくため、すべてのモジュールをここでインポートしておく
@@ -12,10 +14,12 @@ import { ScheduleModule } from '@nestjs/schedule';
   imports: [
     // スケジュール機能をアプリケーション全体に提供する
     ScheduleModule.forRoot(),
-    // .envを読み込むためのモジュール
+    // 環境変数をアプリケーション全体に提供する(NEST経由でprocess.envにアクセス可能)
     ConfigModule.forRoot({
-      isGlobal: true, // ConfigModuleをグローバルに設定することで、他モジュール内で.envファイルの環境変数をアプリケーション全体で使用可能にする(インポート不要で使用可能)
+      isGlobal: true,
       envFilePath: ['../.env'],
+      // ConfigService.get('~')でアクセス可能
+      load: [jwtConfig, dbConfig],
     }),
     AuthModule,
     LoginModule,

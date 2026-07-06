@@ -2,7 +2,7 @@ import { promises } from 'fs';
 import { schedule } from 'node-cron';
 import { join } from 'path';
 import Config from './config';
-import { toJapaneseString } from './dateUtils';
+import { toJapaneseString } from './date-utils';
 import { WmsRequest } from 'src/type/wms-request';
 Error.stackTraceLimit = 30;
 

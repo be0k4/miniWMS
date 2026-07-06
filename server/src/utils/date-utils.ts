@@ -2,6 +2,12 @@
  * Date拡張
  */
 
+/**
+ * 日付を日本語形式の文字列に変換する
+ * @param date 日付オブジェクト
+ * @param millisecond ミリ秒まで表示するかどうか
+ * @returns 日本語形式の文字列
+ */
 export function toJapaneseString(
   date: Date,
   millisecond: boolean = false,
@@ -47,10 +53,21 @@ export function toJapaneseString(
   );
 }
 
+/**
+ * 日付を日本時間に変換する
+ * @param date 日付オブジェクト
+ * @returns 日本時間の日付オブジェクト
+ */
 export function toJTC(date: Date): Date {
   return new Date(date.getTime() + 1000 * 60 * 60 * 9);
 }
 
+/**
+ * 日付をHHMMSS形式の文字列に変換する
+ * @param date 日付オブジェクト
+ * @param millisecond ミリ秒まで表示するかどうか
+ * @returns HHMMSS形式の文字列
+ */
 export function toHHMMSS(date: Date, millisecond: boolean = false): string {
   const hours = date.getHours().toString();
   const minutes = date.getMinutes().toString();
@@ -64,6 +81,11 @@ export function toHHMMSS(date: Date, millisecond: boolean = false): string {
   );
 }
 
+/**
+ * 日付をYYYYMMDD形式の文字列に変換する
+ * @param date 日付オブジェクト
+ * @returns YYYYMMDD形式の文字列
+ */
 export function toYYYYMMDD(date: Date): string {
   const year = date.getFullYear().toString();
   const month = (date.getMonth() + 1).toString();

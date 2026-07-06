@@ -11,7 +11,9 @@ import fastifyStatic from '@fastify/static';
 import Config from './utils/config';
 import * as fs from 'fs';
 import Logging from './utils/logging';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+// 実行コマンドは node dist/main.js [portNo] [enableSSL]を想定
 const portNo = Number.isNaN(Number(process.argv[2]))
   ? 30001
   : Number(process.argv[2]);
@@ -31,6 +33,7 @@ async function bootstrap() {
     fastifyadapter = new FastifyAdapter();
     console.log('起動しました', `HTTP:${portNo}`);
   }
+
   // NestJSアプリケーションの作成
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -42,6 +45,20 @@ async function bootstrap() {
     root: __dirname + imageConfig.path,
     prefix: imageConfig.prefix,
   });
+
+  // swagger
+  // 仕様書のタイトルや説明文を設定
+  const config = new DocumentBuilder()
+    .setTitle('ミニWMS API仕様書')
+    .setDescription('')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  // 第一引数の 'doc' が、URLの末尾になる
+  // 例: http://localhost:30001/doc
+  SwaggerModule.setup('doc', app, document);
 
   //pipe, interceptorの設定
   app.enableCors();

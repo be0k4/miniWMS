@@ -1,0 +1,34 @@
+import { registerAs } from '@nestjs/config';
+
+// 取得時はConfigService.get('database.~')でアクセス可能
+// 機密情報はセキュリティの観点から、コードベースに記述しない
+export default registerAs<DBConfig>('database', () => {
+  // 環境変数から DB 名を自動検出する
+  // サポートする形式: DB_NAME_<XX> という形式で複数定義可能（例: DB_NAME_HOGE=XX databases[hoge] = XX )という形で格納される
+  const databases: { [key: string]: string } = {};
+  Object.keys(process.env).forEach((e) => {
+    if (!e.startsWith('DB_NAME_')) return;
+    const suffix = e.substring('DB_NAME_'.length);
+    if (!suffix) return;
+    const key = suffix.toLowerCase();
+    databases[key] = process.env[e] ?? '';
+  });
+
+  return {
+    host: process.env.DB_HOST ?? '',
+    user: process.env.DB_USER ?? '',
+    password: process.env.DB_PASSWORD ?? '',
+    role: process.env.DB_ROLE ?? '',
+    databases,
+    port: Number(process.env.DB_PORT ?? 5433),
+  };
+});
+
+export type DBConfig = {
+  host: string;
+  user: string;
+  password: string;
+  role: string;
+  databases: { [key: string]: string };
+  port: number;
+};
