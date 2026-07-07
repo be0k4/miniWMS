@@ -32,14 +32,12 @@ export interface Image {
   path: string;
   prefix: string;
 }
-
+import configData from './configFile.json';
 /**
  * 設定ファイル
  */
 export default class Config {
-  static #config: Record<string, unknown> = JSON.parse(
-    readFileSync(__dirname + '/configFile.json').toString(),
-  );
+  static #config: Record<string, unknown> = configData;
 
   static #logSetting: LogSetting;
   static getLogSetting(): LogSetting {

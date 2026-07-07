@@ -31,6 +31,7 @@ export class LoginRepository {
             ,   pass_word as password
         FROM    user_profile
         WHERE   user_profile_cd = $1
+        AND    is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
     // ログイン時にはJWTAuthGuardがまだ実行されていないため
@@ -60,19 +61,11 @@ export class LoginRepository {
             ,   u.whs_cd
             ,   u.whs_nm
             ,   u.user_grp_cd
-            ,   array_agg(m.menu_grp_cd) as menu_grp_cd
         FROM user_profile u 
-        JOIN menu_grp m ON m.user_grp_cd = u.user_grp_cd
         JOIN agent a ON a.agent_cd = u.agent_cd
         WHERE u.user_profile_cd = $1
-        GROUP BY
-                u.user_profile_cd
-            ,   u.user_nm
-            ,   u.agent_cd
-            ,   a.agent_nm
-            ,   u.whs_cd
-            ,   u.whs_nm
-            ,   u.user_grp_cd
+        AND u.is_enabled = 'Y'
+        AND a.is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
     // ログイン時にはJWTAuthGuardがまだ実行されていないため

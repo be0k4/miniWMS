@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
-import { verifyPassword } from 'src/login/crypto';
 import { LoginRepository, LoginUserInfo } from './login.repository';
 import { LoginPostRequestParameter } from './login.controller';
 
@@ -30,7 +29,10 @@ export class LoginService {
       body.whs_cd,
       body.agent_cd,
     );
-    const canLogin = await verifyPassword(stored.password, body.password);
+    const canLogin = await this.loginRepository.verifyPassword(
+      stored.password,
+      body.password,
+    );
 
     if (!canLogin) {
       return { result: false };
