@@ -25,24 +25,24 @@ export class LoginRepository {
     user_id: string,
     whs_cd: string,
     agent_cd: string,
-  ): Promise<{ userId: string; password: string }> {
+  ): Promise<{ user_id: string; password: string }> {
     const sql = `
-        SELECT  user_profile_cd as userid
-            ,   pass_word as password
-        FROM    user_profile
-        WHERE   user_profile_cd = $1
+        SELECT  user_id
+            ,   password
+        FROM    users
+        WHERE   user_id = $1
         AND    is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
     // ログイン時にはJWTAuthGuardがまだ実行されていないため
     req.userInfo = { user_id, whs_cd, agent_cd };
     const res = await this.db.execQuery<{
-      userid: string;
+      user_id: string;
       password: string;
     }>(req, sql, [user_id]);
-    if (res.length === 0) return { userId: '', password: '' };
+    if (res.length === 0) return { user_id: '', password: '' };
     return {
-      userId: res[0].userid,
+      user_id: res[0].user_id,
       password: res[0].password,
     };
   }
@@ -54,16 +54,15 @@ export class LoginRepository {
     agent_cd: string,
   ): Promise<LoginUserInfo> {
     const sql = `
-        SELECT  u.user_profile_cd as user_id
+        SELECT  u.user_id
             ,   u.user_nm
             ,   u.agent_cd
             ,   a.agent_nm
             ,   u.whs_cd
             ,   u.whs_nm
-            ,   u.user_grp_cd
-        FROM user_profile u 
+        FROM users u
         JOIN agent a ON a.agent_cd = u.agent_cd
-        WHERE u.user_profile_cd = $1
+        WHERE u.user_id = $1
         AND u.is_enabled = 'Y'
         AND a.is_enabled = 'Y'
         `;

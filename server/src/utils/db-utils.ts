@@ -18,6 +18,8 @@ type RLSClient = PoolClient & {
 };
 /**
  * DB共通クラス
+ * このアーキテクチャは複数荷主・複数拠点を考慮した設計です
+ * 各荷主はDB単位で分離し、各拠点はRLSでアクセス制御を行います
  */
 @Injectable()
 export default class DBUtils implements OnModuleInit {
@@ -44,14 +46,12 @@ export default class DBUtils implements OnModuleInit {
     DBUtils.instance = this;
     const databaseConfig = this.configService.getOrThrow<DBConfig>('database');
 
-    // 接続を初期化する: モジュール起動時に各荷主の Pool を作成して再利用する
-    // マルチテナント対応のため、Poolで複数の接続を監理する構成にする
+    // モジュール起動時に各荷主の Pool を作成して再利用する
     try {
-      const dbs = databaseConfig.databases;
-      Object.keys(dbs).forEach((k) => {
-        const agentDB = dbs[k];
-
-        if (!DBUtils.pools.has(agentDB)) {
+      const agentOnDb = databaseConfig.databases;
+      Object.keys(agentOnDb).forEach((agentName) => {
+        const agentDB = agentOnDb[agentName];
+        if (!DBUtils.pools.has(agentName.toUpperCase())) {
           // 開発環境
           if (process.env.NODE_ENV !== 'production') {
             const pool = new Pool({
@@ -63,12 +63,10 @@ export default class DBUtils implements OnModuleInit {
               application_name: 'miniWMS_api',
               query_timeout: 3 * 60 * 1000, // パフォーマンスが悪いSQLは3分でタイムアウト
               statement_timeout: 3 * 60 * 1000,
-              ssl: {
-                rejectUnauthorized: false,
-              },
+              ssl: false,
               max: 5,
             });
-            DBUtils.pools.set(agentDB, pool);
+            DBUtils.pools.set(agentName.toUpperCase(), pool);
           } else {
             // 本番環境
             const pool = new Pool({
@@ -86,7 +84,7 @@ export default class DBUtils implements OnModuleInit {
               },
               max: 3,
             });
-            DBUtils.pools.set(agentDB, pool);
+            DBUtils.pools.set(agentName.toUpperCase(), pool);
           }
         }
       });

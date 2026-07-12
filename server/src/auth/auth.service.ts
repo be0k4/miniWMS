@@ -29,11 +29,12 @@ export class AuthService {
 
   /**
    * ログイン時に使用するワンタイムトークンを生成する
-   * @returns ワンタイムトークン
    */
   async generateOneTimeToken(): Promise<{ token: string }> {
     const payload = this.oneTimeTokenRepository.generatePayload();
     const options = this.configService.get('jwt.oneTimeTokenOptions');
+    // 認証ライブラリのsignAsyncによって
+    // iat(発行時刻)は自動で付与、exp(有効期限)はexpiresInで指定した時間で自動で付与される
     return { token: await this.jwtService.signAsync(payload, { ...options }) };
   }
 

@@ -13,14 +13,14 @@ class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // 期限切れのトークンでもvalidateを通すようにし、リクレッシュトークンでの更新を促す
+      // 期限切れのトークンでもGuardを通すようにし、リフレッシュトークンでの更新を促す
       ignoreExpiration: true,
       secretOrKey: configService.getOrThrow<string>('jwt.secret'),
     });
   }
 
   // 検証内容
-  validate(payload: JwtPayload & { ias: number; exp: number }) {
+  validate(payload: JwtPayload & { iat: number; exp: number }) {
     if (
       payload.iss !== this.configService.getOrThrow<string>('jwt.iss') ||
       (payload.type !== 'access' && payload.type !== 'refresh')
@@ -51,6 +51,7 @@ class OneTimeTokenStrategy extends PassportStrategy(Strategy, 'ott') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // 期限切れのトークンはGuardで弾く
       ignoreExpiration: false,
       secretOrKey: configService.getOrThrow<string>('jwt.secret'),
     });

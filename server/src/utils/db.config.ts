@@ -1,16 +1,15 @@
 import { registerAs } from '@nestjs/config';
 
 // 取得時はConfigService.get('database.~')でアクセス可能
-// 機密情報はセキュリティの観点から、コードベースに記述しない
 export default registerAs<DBConfig>('database', () => {
-  // 環境変数から DB 名を自動検出する
-  // サポートする形式: DB_NAME_<XX> という形式で複数定義可能（例: DB_NAME_HOGE=XX databases[hoge] = XX )という形で格納される
+  // サポートする形式: DB_NAME_<荷主名> = <DB名>という形式で複数定義可能（例: DB_NAME_HOGE=XX)
+  // database[荷主名] = DB名 でMapに格納される
   const databases: { [key: string]: string } = {};
   Object.keys(process.env).forEach((e) => {
     if (!e.startsWith('DB_NAME_')) return;
     const suffix = e.substring('DB_NAME_'.length);
     if (!suffix) return;
-    const key = suffix.toLowerCase();
+    const key = suffix.toUpperCase();
     databases[key] = process.env[e] ?? '';
   });
 

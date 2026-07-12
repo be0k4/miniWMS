@@ -4,22 +4,18 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 
 @Injectable()
+/**
+ * ワンタイムトークンの再利用防止のブラックリストと、そのクリーンアップを行うサービス
+ */
 export class TokenBlacklistService implements OnModuleInit {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly schedulerRegistry: SchedulerRegistry,
-  ) {}
+  constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
   blackList: { sub: string; expriredTime: number }[] = [];
   removeExpired = () => {
     try {
       const currentTime = Math.floor(Date.now() / 1000);
-      // 期限切れのデータを削除
-      while (
-        this.blackList[0] &&
-        this.blackList[0].expriredTime <= currentTime
-      ) {
-        this.blackList.shift();
-      }
+      this.blackList = this.blackList.filter(
+        (entry) => entry.expriredTime > currentTime,
+      );
     } catch (error) {
       console.error(error);
     }
@@ -31,11 +27,9 @@ export class TokenBlacklistService implements OnModuleInit {
 
   // @CronではDI前にスケジュールが設定されてしまうため、onModuleInitでスケジュールの設定を行う
   onModuleInit() {
-    // .envからワンタイムトークンの有効期限を取得して、Cronのスケジュールを動的に設定する
-    const expiresIn =
-      this.configService.get<string>('jwt.oneTimeTokenOptions.expiresIn') ??
-      '1m';
-    const cronTime = `0 */${expiresIn.replace('m', '')} * * * *`;
+    // 1分間隔で実行
+    // cronTimeの書式は、秒 分 時 日 月 曜日 年の順で指定する
+    const cronTime = `0 */1 * * * *`;
 
     const job = new CronJob(cronTime, () => {
       this.removeExpired();

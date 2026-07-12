@@ -12,6 +12,10 @@ export class LoginService {
     private readonly loginRepository: LoginRepository,
   ) {}
 
+  /**
+   * argon2でハッシュ化されたパスワードを取得し、入力されたパスワードと比較してログイン可能か判定する
+   * @returns 成功時はアクセス/リフレッシュトークンを返す。
+   */
   async tryLogin(
     req: any,
     body: LoginPostRequestParameter,
@@ -39,12 +43,12 @@ export class LoginService {
     }
     const user = await this.loginRepository.getUser(
       req,
-      stored.userId,
+      stored.user_id,
       body.whs_cd,
       body.agent_cd,
     );
     const token = await this.authService.generateAccessToken(
-      stored.userId,
+      stored.user_id,
       user.agent_cd,
       user.whs_cd,
     );

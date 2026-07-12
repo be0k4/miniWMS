@@ -2,6 +2,7 @@ CREATE TABLE public.users (
     user_id character varying(10) NOT NULL,
     whs_cd character varying(8) NOT NULL,               -- 倉庫コード
     user_nm character varying(40) NOT NULL,             -- ユーザー名
+    whs_nm character varying(40) NOT NULL,               -- 倉庫名
     password character varying NOT NULL,                -- パスワード（NestJSでハッシュ化）
     email character varying(50),                        -- メールアドレス
     agent_cd character varying(3),                      -- 担当荷主コード
