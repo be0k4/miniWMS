@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller()
+// LBのヘルスチェック用API
+@Controller('healthcheck')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @HttpCode(HttpStatus.OK) // 200 OK を強制する
+  getHealth() {
+    return this.appService.getHealth();
   }
 }

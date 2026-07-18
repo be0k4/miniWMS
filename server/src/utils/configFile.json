@@ -1,0 +1,37 @@
+{
+  "print": {
+    "AAA": {
+      "001": {
+        "path": "",
+        "exe": "A.exe",
+        "enabledWriter": false,
+        "print_step_url": ""
+      }
+    }
+  },
+  "log": {
+    "path": "./log",
+    "rotatePeriod": 7
+  },
+  "export": {
+    "excel": {
+      "outputPath": "./export",
+      "templatePath": "./template"
+    }
+  },
+  "write": {
+    "file": {
+      "templatePath": "./template"
+    }
+  },
+  "agent": {
+    "AAA": {
+      "searchInputCd": false,
+      "replaceSku": false
+    }
+  },
+  "image": {
+    "path": "/../image",
+    "prefix": "/image/"
+  }
+}
