@@ -1,10 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import AppRouter from "./AppRouter.tsx";
+import AppProviders from "./components/common/AppProviders.tsx";
 
-createRoot(document.getElementById('root')!).render(
+// アプリケーションの初期化と、グローバルな状態管理
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <AppProviders>
+      <AppRouter />
+    </AppProviders>
   </StrictMode>,
-)
+);

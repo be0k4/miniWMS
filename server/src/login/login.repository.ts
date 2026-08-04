@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import DBUtils from 'src/utils/db-utils';
+import DBUtils from 'src/utils/db-utils.service';
 import argon2 from 'argon2';
 
 export type LoginUserInfo = {

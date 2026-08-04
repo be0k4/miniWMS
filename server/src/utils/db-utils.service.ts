@@ -70,7 +70,6 @@ export default class DBUtils implements OnModuleInit {
           } else {
             // 本番環境
             const pool = new Pool({
-              // hostにはロードバランサーのホスト名を指定してSSL通信を行う
               host: databaseConfig.host,
               database: agentDB,
               user: databaseConfig.user,
@@ -80,7 +79,7 @@ export default class DBUtils implements OnModuleInit {
               query_timeout: 3 * 60 * 1000, // パフォーマンスが悪いSQLは3分でタイムアウト
               statement_timeout: 3 * 60 * 1000,
               ssl: {
-                rejectUnauthorized: true,
+                rejectUnauthorized: true, // 本番では暗号化通信を強制する。postgres側で制御
               },
               max: 3,
             });
