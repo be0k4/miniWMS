@@ -34,8 +34,6 @@ export class LoginRepository {
         AND    is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
-    // ログイン時にはJWTAuthGuardがまだ実行されていないため
-    req.userInfo = { user_id, whs_cd, agent_cd };
     const res = await this.db.execQuery<{
       user_id: string;
       password: string;
@@ -67,8 +65,6 @@ export class LoginRepository {
         AND a.is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
-    // ログイン時にはJWTAuthGuardがまだ実行されていないため
-    if (!req.userInfo) req.userInfo = { user_id, whs_cd, agent_cd };
     const res = await this.db.execQuery<LoginUserInfo>(req, sql, [user_id]);
     return res[0];
   }

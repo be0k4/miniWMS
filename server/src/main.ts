@@ -13,26 +13,14 @@ import * as fs from 'fs';
 import Logging from './utils/logging';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-// 実行コマンドは node dist/main.js [portNo] [enableSSL]を想定
+// 実行コマンドは node dist/main.js [portNo] を想定
 const portNo = Number.isNaN(Number(process.argv[2]))
   ? 30001
   : Number(process.argv[2]);
-const enableSSL =
-  process.argv[3] === undefined || process.argv[3] === 'false' ? false : true;
 
 async function bootstrap() {
-  let fastifyadapter;
-  if (enableSSL) {
-    const httpsOptions = {
-      key: fs.readFileSync('./server.key'),
-      cert: fs.readFileSync('./server.crt'),
-    };
-    fastifyadapter = new FastifyAdapter({ https: httpsOptions });
-    console.log('起動しました', `HTTPS:${portNo}`);
-  } else {
-    fastifyadapter = new FastifyAdapter();
-    console.log('起動しました', `HTTP:${portNo}`);
-  }
+  const fastifyadapter = new FastifyAdapter();
+  console.log('起動しました', `HTTP:${portNo}`);
 
   // NestJSアプリケーションの作成
   const app = await NestFactory.create<NestFastifyApplication>(
