@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { Req } from '@nestjs/common/decorators';
@@ -12,6 +13,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { OneTimeTokenAuthGuard } from 'src/auth/jwt-auth.guard';
 import { LoginService } from './login.service';
 import { IsNotEmpty } from 'class-validator';
+import type { FastifyReply } from 'fastify';
+import {
+  REFRESH_TOKEN_COOKIE_NAME,
+  refreshTokenCookieOptions,
+} from 'src/auth/refresh-token-cookie';
 
 class LoginPostResponseParameter {
   result: boolean = false;
@@ -43,16 +49,34 @@ export class LoginController {
 
   @UseGuards(OneTimeTokenAuthGuard)
   @Post()
-  @HttpCode(200) // 標準は201 Createdを返してしまう
+  @HttpCode(200)
   @ApiOkResponse({
     description: 'ログイン成功時のレスポンス',
     type: LoginPostResponseParameter,
   })
   async tryLogin(
     @Req() req,
+    @Res({ passthrough: true }) reply: FastifyReply,
     @Body()
     body: LoginPostRequestParameter,
   ) {
-    return await this.loginService.tryLogin(req, body);
+    const result = await this.loginService.tryLogin(req, body);
+
+    if (!result.result) {
+      return result;
+    }
+
+    // リフレッシュトークンはクッキーで返却する
+    reply.setCookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      refreshTokenCookieOptions,
+    );
+
+    // アクセストークンはそのまま返却し、ブラウザのメモリに保持させる
+    return {
+      ...result,
+      refreshToken: undefined,
+    };
   }
 }

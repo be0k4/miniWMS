@@ -9,20 +9,20 @@ import { CronJob } from 'cron';
  */
 export class TokenBlacklistService implements OnModuleInit {
   constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
-  blackList: { sub: string; expriredTime: number }[] = [];
+  blackList: { sub: string; expiredTime: number }[] = [];
   removeExpired = () => {
     try {
       const currentTime = Math.floor(Date.now() / 1000);
       this.blackList = this.blackList.filter(
-        (entry) => entry.expriredTime > currentTime,
+        (entry) => entry.expiredTime > currentTime,
       );
     } catch (error) {
       console.error(error);
     }
   };
 
-  add(sub: string, expriredTime: number) {
-    this.blackList.push({ sub, expriredTime });
+  add(sub: string, expiredTime: number) {
+    this.blackList.push({ sub, expiredTime });
   }
 
   // @CronではDI前にスケジュールが設定されてしまうため、onModuleInitでスケジュールの設定を行う

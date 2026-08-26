@@ -1,16 +1,11 @@
-import {
-  Controller,
-  Get,
-  Head,
-  Header,
-  Headers,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-// javascriptには存在しない型情報をインポートするため、import typeを使用している
-import type { JwtPayload } from 'src/interface/jwt-repository.interface';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GuardResponse, JwtAuthGuard } from './jwt-auth.guard';
+import type { FastifyReply } from 'fastify';
+import {
+  REFRESH_TOKEN_COOKIE_NAME,
+  refreshTokenCookieOptions,
+} from './refresh-token-cookie';
 
 @Controller('auth')
 export class AuthController {
@@ -19,14 +14,28 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('refresh-token')
   async refreshToken(
-    @Headers('Authorization') auth: string,
-    @GuardResponse() user: JwtPayload,
+    // レスポンスを操作可能にするpsassthroughオプションを有効化
+    @Res({ passthrough: true }) reply: FastifyReply,
+    @GuardResponse()
+    user: { user_id: string; whs_cd: string; agent_cd: string },
   ) {
-    return await this.authService.refreshToken(
-      user.userId,
-      user.agentCd,
-      user.whsCd,
+    const token = await this.authService.refreshToken(
+      user.user_id,
+      user.agent_cd,
+      user.whs_cd,
     );
+
+    // リフレッシュトークンはクッキーで返却する
+    reply.setCookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      token.refreshToken,
+      refreshTokenCookieOptions,
+    );
+
+    // アクセストークンはそのまま返却し、ブラウザのメモリに保持させる
+    return {
+      accessToken: token.accessToken,
+    };
   }
 
   // @UseGuards(JwtAuthGuard)

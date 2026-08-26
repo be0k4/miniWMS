@@ -15,8 +15,10 @@
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@mui/x-data-grid": "^9.3.0",
+    "axios": "^1.19.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hook-form": "^7.85.0",
     "react-router-dom": "^7.18.1",
     "recoil": "^0.7.7"
   },

@@ -6,13 +6,22 @@ import { JwtPayload } from 'src/interface/jwt-repository.interface';
 import { OneTimeTokenPayload } from 'src/interface/one-time-token-repository.interface';
 import { authException } from 'src/type/exception';
 import { TokenBlacklistService } from './token-blacklist-service';
+import { REFRESH_TOKEN_COOKIE_NAME } from './refresh-token-cookie';
 
 // PassportStrategyの第2引数は、デフォルトの戦略名を指定する。
 @Injectable()
 class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      //基本はアクセストークンで認証する。リフレッシュトークンはアクセストークン更新時に認証される
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        // JWTの取得方法を指定する 配列の先の要素 アクセストークン > リフレッシュトークンの順で取得する
+        // アクセス
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        // リフレッシュ
+        (request: { cookies?: Record<string, string> }) =>
+          request?.cookies?.[REFRESH_TOKEN_COOKIE_NAME] ?? null,
+      ]),
       // 期限切れのトークンでもGuardを通すようにし、リフレッシュトークンでの更新を促す
       ignoreExpiration: true,
       secretOrKey: configService.getOrThrow<string>('jwt.secret'),

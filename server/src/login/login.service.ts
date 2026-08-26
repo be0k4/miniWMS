@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
-import { LoginRepository, LoginUserInfo } from './login.repository';
+import { LoginRepository } from './login.repository';
 import { LoginPostRequestParameter } from './login.controller';
 
 @Injectable()
@@ -23,7 +23,8 @@ export class LoginService {
     | {
         result: true;
         user: { user_id: string };
-        token: { accessToken: string; refreshToken: string };
+        accessToken: string;
+        refreshToken: string;
       }
     | { result: false }
   > {
@@ -55,7 +56,8 @@ export class LoginService {
     return {
       result: true,
       user,
-      token,
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
     };
   }
   catch(e: any) {

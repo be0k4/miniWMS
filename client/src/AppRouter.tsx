@@ -6,22 +6,34 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
+import LoginPage from "./components/pages/LoginPage";
+import { authTokenStorage } from "./utils/accessTokenStorage";
 
-// ひながたのページコンポーネントを定義
-const LoginPage = () => <div>Login Test Page</div>;
 const MainPage = () => <div>Main Test Page</div>;
 const HelpPage = () => <div>Help Test Page</div>;
-// ログイン後の画面を共通レイアウトでラップするためのコンポーネント
-const ProtectedLayout = () => <Outlet />;
+// 各ルートを認証ガードでラップする
+const ProtectedLayout = () => {
+  if (!authTokenStorage.hasAccessToken()) {
+    return <Navigate to="/login" replace />;
+  }
+  // Outletは子ルートのコンポーネントを表示する
+  return <Outlet />;
+};
+
+const LoginRoute = () => {
+  if (authTokenStorage.hasAccessToken()) {
+    return <Navigate to="/main" replace />;
+  }
+  return <LoginPage />;
+};
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* ログイン画面（単体レイアウト） */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<LoginRoute />} />
 
-      {/* ログイン後画面（ProtectedLayoutで共通ラップするグループ
-      ここはログイン状態をチェックするガードを入れる */}
+      {/* ログイン後画面（ProtectedLayoutで共通ラップするグループ） */}
       <Route element={<ProtectedLayout />}>
         {/* replaceは戻るボタンの無限ループ抑制 */}
         <Route path="/" element={<Navigate to="/main" replace />} />

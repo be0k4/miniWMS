@@ -8,6 +8,7 @@ import { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './logging.interceptor';
 import fastifyStatic from '@fastify/static';
+import fastifyCookie from '@fastify/cookie';
 import Config from './utils/config';
 import * as fs from 'fs';
 import Logging from './utils/logging';
@@ -34,6 +35,9 @@ async function bootstrap() {
     prefix: imageConfig.prefix,
   });
 
+  // Cookie関連のapiを有効化
+  app.register(fastifyCookie);
+
   // swagger
   // 仕様書のタイトルや説明文を設定
   const config = new DocumentBuilder()
@@ -48,8 +52,13 @@ async function bootstrap() {
   // 例: http://localhost:30001/doc
   SwaggerModule.setup('doc', app, document);
 
+  // 同一オリジンでの通信ではCORSの設定をしなくてもOK
+  // app.enableCors({
+  //   origin: true,
+  //   credentials: true,
+  // });
+
   //pipe, interceptorの設定
-  app.enableCors();
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({

@@ -31,7 +31,7 @@ class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const api = request.raw.url.split('?')[0];
 
-    // リフレッシュトークンでトークン更新以外のAPIを呼べないようにする
+    // リフレッシュトークンで認証された場合、アクセストークン更新API以外のアクセスは拒否する
     if (api !== '/auth/refresh-token' && user.type === 'refresh') {
       console.log('reject');
       throw new UnauthorizedException();
@@ -74,9 +74,10 @@ class OneTimeTokenAuthGuard extends AuthGuard('ott') {
 }
 
 /**
- * リクエストのuserInfoを取得するためのデコレーター
+ * ottやjwtのGuardでリクエストに設定されるRLS用のuserInfoを取得するためのデコレーター。
+ * ”@GuardResponse(user_id) user { user_id: string }”のように、userInfoの特定のプロパティを取得することも可能
  * @param property 取得したいプロパティ名（省略可）
- * @param context ExecutionContext
+ * @param context ExecutionContext（NestJSが自動で設定するため、指定不可）
  * @returns userInfoオブジェクトまたは指定したプロパティの値
  */
 const GuardResponse = createParamDecorator(
