@@ -1,5 +1,6 @@
 export const REFRESH_TOKEN_COOKIE_NAME = 'miniwms.refreshToken';
-
+// リフレッシュトークンはログイン時に発行してクッキーに保存する。
+// 下記の有効期限切れ後、再度ログインして新しいリフレッシュトークンを取得する設計。
 // 有効期限は24時間に設定
 export const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 

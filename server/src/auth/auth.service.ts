@@ -23,10 +23,6 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  validateUser(username: string, pass: string): Promise<boolean> {
-    return Promise.resolve(username === 'SS' && pass === '1');
-  }
-
   /**
    * ログイン時に使用するワンタイムトークンを生成する
    */
@@ -76,16 +72,24 @@ export class AuthService {
   }
 
   /**
-   * APIのアクセストークンを更新する
+   * APIのアクセストークンを更新する（固定リフレッシュトークン方針）
    * @param userId ログイン時のユーザーID
-   * @param refreshToken ユーザーのリフレッシュトークン
-   * @returns 新たなAPIのアクセストークン/リフレッシュトークン
    */
   async refreshToken(
     userId: string,
     agentCd: string,
     whsCd: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    return await this.generateAccessToken(userId, agentCd, whsCd);
+  ): Promise<{ accessToken: string }> {
+    const accessTokenPayload = this.jwtRepository.generatePayload(
+      userId,
+      agentCd,
+      whsCd,
+      'access',
+    );
+    const accessTokenOptions = this.configService.get('jwt.accessTokenOptions');
+    const accessToken = await this.jwtService.signAsync(accessTokenPayload, {
+      ...accessTokenOptions,
+    });
+    return { accessToken };
   }
 }

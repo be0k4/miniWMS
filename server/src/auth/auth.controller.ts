@@ -19,22 +19,14 @@ export class AuthController {
     @GuardResponse()
     user: { user_id: string; whs_cd: string; agent_cd: string },
   ) {
-    const token = await this.authService.refreshToken(
+    const { accessToken } = await this.authService.refreshToken(
       user.user_id,
       user.agent_cd,
       user.whs_cd,
     );
 
-    // リフレッシュトークンはクッキーで返却する
-    reply.setCookie(
-      REFRESH_TOKEN_COOKIE_NAME,
-      token.refreshToken,
-      refreshTokenCookieOptions,
-    );
-
-    // アクセストークンはそのまま返却し、ブラウザのメモリに保持させる
     return {
-      accessToken: token.accessToken,
+      accessToken,
     };
   }
 
