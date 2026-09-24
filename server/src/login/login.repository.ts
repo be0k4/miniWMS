@@ -77,6 +77,6 @@ export class LoginRepository {
     storedHash: string,
     password: string,
   ): Promise<boolean> => {
-    return await argon2.verify(storedHash, password);
+    return await argon2.verify(storedHash, password).catch(() => false);
   };
 }

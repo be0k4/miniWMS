@@ -28,9 +28,7 @@ type LoginResponse = {
   user?: {
     user_id: string;
   };
-  token?: {
-    accessToken: string;
-  };
+  accessToken?: string;
 };
 
 const LoginPage = () => {
@@ -86,18 +84,16 @@ const LoginPage = () => {
           },
         );
 
-        if (
-          !loginResponse.data.result ||
-          !loginResponse.data.token?.accessToken
-        ) {
+        if (!loginResponse.data.result || !loginResponse.data.accessToken) {
           authTokenStorage.clear();
           showMessage("ユーザーIDまたはパスワードが不正です。", "error");
           return;
         }
 
         authTokenStorage.set({
-          accessToken: loginResponse.data.token.accessToken,
+          accessToken: loginResponse.data.accessToken,
         });
+        console.log("Access token set:", authTokenStorage.getAccessToken());
         showMessage("ログインしました。", "success");
         navigate("/main");
       } catch (error) {
@@ -273,8 +269,8 @@ const LoginPage = () => {
                 rules={{
                   required: "パスワードは必須です。",
                   minLength: {
-                    value: 8,
-                    message: "パスワードは8文字以上で入力してください。",
+                    value: 4,
+                    message: "パスワードは4文字以上で入力してください。",
                   },
                   maxLength: {
                     value: 128,
@@ -296,7 +292,7 @@ const LoginPage = () => {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={!isValid || isSubmitting || !hasRlsParams}
+                disabled={!isValid || isSubmitting}
                 sx={{ height: 44, fontWeight: 700 }}
               >
                 {isSubmitting ? "ログイン中..." : "ログイン"}

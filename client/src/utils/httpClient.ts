@@ -12,9 +12,12 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & {
 };
 
 // アプリ全体で使用するHTTPクライアント
+const DEFAULT_TIMEOUT =
+  typeof import.meta !== "undefined" && import.meta.env?.DEV ? 0 : 10000;
+
 export const httpClient = axios.create({
   baseURL: "/api",
-  timeout: 10000,
+  timeout: DEFAULT_TIMEOUT,
   // Cookieの送信を有効化する
   withCredentials: true,
 });
@@ -22,7 +25,7 @@ export const httpClient = axios.create({
 // httpClient側でインターセプタを設定しているため、再帰的に呼ばれないため専用クライアントに分ける
 const refreshClient = axios.create({
   baseURL: "/api",
-  timeout: 10000,
+  timeout: DEFAULT_TIMEOUT,
   withCredentials: true,
 });
 
@@ -72,6 +75,7 @@ httpClient.interceptors.response.use(
     try {
       const newAccessToken = await refreshAccessToken();
       setAuthorizationHeader(originalRequest, newAccessToken);
+      // アクセストークンを更新した後、元のリクエストを再試行する
       return httpClient(originalRequest);
     } catch {
       authTokenStorage.clear();

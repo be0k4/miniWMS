@@ -12,10 +12,10 @@ class JwtRepository implements IJwtRepository {
   constructor(private readonly configService: ConfigService) {}
 
   generatePayload(
-    type: JwtType,
     userId: string,
     agentCd: string,
     whsCd: string,
+    type: JwtType,
     jti: string = randomUUID(),
   ): JwtPayload {
     const payload: JwtPayload = {
