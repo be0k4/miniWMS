@@ -6,7 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { LoginController } from './login.controller';
 import { LoginService } from './login.service';
 import { LoginRepository } from './login.repository';
-import DButils from 'src/utils/db-utils';
+import DButils from 'src/utils/db-utils.service';
 @Module({
   imports: [
     PassportModule,

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import DBUtils from 'src/utils/db-utils';
+import DBUtils from 'src/utils/db-utils.service';
 import argon2 from 'argon2';
 
 export type LoginUserInfo = {
@@ -34,8 +34,6 @@ export class LoginRepository {
         AND    is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
-    // ログイン時にはJWTAuthGuardがまだ実行されていないため
-    req.userInfo = { user_id, whs_cd, agent_cd };
     const res = await this.db.execQuery<{
       user_id: string;
       password: string;
@@ -67,8 +65,6 @@ export class LoginRepository {
         AND a.is_enabled = 'Y'
         `;
     // RLS用にuserInfoを設定
-    // ログイン時にはJWTAuthGuardがまだ実行されていないため
-    if (!req.userInfo) req.userInfo = { user_id, whs_cd, agent_cd };
     const res = await this.db.execQuery<LoginUserInfo>(req, sql, [user_id]);
     return res[0];
   }
@@ -81,6 +77,6 @@ export class LoginRepository {
     storedHash: string,
     password: string,
   ): Promise<boolean> => {
-    return await argon2.verify(storedHash, password);
+    return await argon2.verify(storedHash, password).catch(() => false);
   };
 }

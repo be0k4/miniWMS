@@ -33,12 +33,15 @@ export class LoggingInterceptor implements NestInterceptor {
     // ここからControllerの処理
     return next.handle().pipe(
       catchError(async (err) => {
+        // 未処理の例外発生時
         const endTime = process.hrtime(startTime);
         const nanoSeconds = endTime[0] * 1_000_000_000 + endTime[1];
         const seconds = nanoSeconds / 1_000_000_000;
+        const errMessage = err?.message ?? String(err);
+        const errStack = err?.stack ? `\n${err.stack}` : '';
         await Logging.debugLog(
           request,
-          `[Timer Error][${seconds.toFixed(3)}s] ${info}`,
+          `[Timer Error][${seconds.toFixed(3)}s] ${info} error=${errMessage}${errStack}`,
         );
         throw err;
       }),
