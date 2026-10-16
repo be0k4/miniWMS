@@ -9,7 +9,7 @@ import {
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import LoginPage from "./components/pages/LoginPage";
-import { authTokenStorage } from "./utils/accessTokenStorage";
+import { authTokenStorage } from "./utils/authSessionStorage";
 import { restoreSessionIfNeeded } from "./utils/httpClient";
 
 const MainPage = () => <div>Main Test Page</div>;

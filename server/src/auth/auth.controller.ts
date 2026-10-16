@@ -17,7 +17,7 @@ export class AuthController {
     // レスポンスを操作可能にするpsassthroughオプションを有効化
     @Res({ passthrough: true }) reply: FastifyReply,
     @GuardResponse()
-    user: { user_id: string; whs_cd: string; agent_cd: string },
+    user: { user_id: string; agent_cd: string; whs_cd: string },
   ) {
     const { accessToken } = await this.authService.refreshToken(
       user.user_id,
@@ -27,6 +27,9 @@ export class AuthController {
 
     return {
       accessToken,
+      authInfo: {
+        ...user,
+      },
     };
   }
 

@@ -11,7 +11,7 @@ import { AxiosError } from "axios";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useGlobalLoading, useGlobalMessage } from "../../hooks/useGlobalUi";
-import { authTokenStorage } from "../../utils/accessTokenStorage";
+import { authTokenStorage } from "../../utils/authSessionStorage";
 import { httpClient } from "../../utils/httpClient";
 
 type LoginFormValues = {
@@ -27,6 +27,8 @@ type LoginResponse = {
   result: boolean;
   user?: {
     user_id: string;
+    agent_cd: string;
+    whs_cd: string;
   };
   accessToken?: string;
 };
@@ -84,7 +86,11 @@ const LoginPage = () => {
           },
         );
 
-        if (!loginResponse.data.result || !loginResponse.data.accessToken) {
+        if (
+          !loginResponse.data.result ||
+          !loginResponse.data.accessToken ||
+          !loginResponse.data.user
+        ) {
           authTokenStorage.clear();
           showMessage("ユーザーIDまたはパスワードが不正です。", "error");
           return;
@@ -92,8 +98,10 @@ const LoginPage = () => {
 
         authTokenStorage.set({
           accessToken: loginResponse.data.accessToken,
+          authInfo: {
+            ...loginResponse.data.user,
+          },
         });
-        console.log("Access token set:", authTokenStorage.getAccessToken());
         showMessage("ログインしました。", "success");
         navigate("/main");
       } catch (error) {

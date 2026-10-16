@@ -13,12 +13,11 @@ import { REFRESH_TOKEN_COOKIE_NAME } from './refresh-token-cookie';
 class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
-      //基本はアクセストークンで認証する。リフレッシュトークンはアクセストークン更新時に認証される
+      //基本はアクセストークンで認証する。リフレッシュトークンはアクセストークン更新時に使用
       jwtFromRequest: ExtractJwt.fromExtractors([
-        // JWTの取得方法を指定する 配列の先の要素 アクセストークン > リフレッシュトークンの順で取得する
-        // アクセス
+        // JWTの取得方法を指定する 配列の先の要素優先
+        // アクセストークン > リフレッシュトークンの順で取得する
         ExtractJwt.fromAuthHeaderAsBearerToken(),
-        // リフレッシュ
         (request: { cookies?: Record<string, string> }) =>
           request?.cookies?.[REFRESH_TOKEN_COOKIE_NAME] ?? null,
       ]),

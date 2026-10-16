@@ -37,7 +37,8 @@ class JwtAuthGuard extends AuthGuard('jwt') {
       throw new UnauthorizedException();
     }
 
-    // user情報(RLS認証用)をリクエストオブジェクトに付与
+    // JWTトークン内(アクセス・リフレッシュ共通)に認証情報を含むため
+    // ガードを通過→認証情報をトークンから抽出で自動付与
     const userInfo = {
       user_id: user.userId,
       whs_cd: user.whsCd,

@@ -1,9 +1,14 @@
 import axios, { AxiosError, AxiosHeaders } from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
-import { authTokenStorage } from "./accessTokenStorage";
+import { authTokenStorage } from "./authSessionStorage";
 
 type RefreshTokenResponse = {
   accessToken: string;
+  authInfo: {
+    user_id: string;
+    agent_cd: string;
+    whs_cd: string;
+  };
 };
 
 // Axiosのリクエスト設定にリトライフラグを追加
@@ -130,8 +135,9 @@ const refreshAccessToken = async (): Promise<string> => {
     refreshInFlight = refreshClient
       .get<RefreshTokenResponse>("/auth/refresh-token")
       .then((response) => {
-        const accessToken = response.data.accessToken;
-        authTokenStorage.set({ accessToken });
+        const { accessToken, authInfo } = response.data;
+        console.log(authInfo);
+        authTokenStorage.set({ accessToken, authInfo });
         return accessToken;
       })
       // 更新完了時にキャッシュをクリア
