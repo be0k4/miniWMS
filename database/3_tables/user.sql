@@ -7,6 +7,7 @@ CREATE TABLE public.users (
     email character varying(50),                        -- メールアドレス
     agent_cd character varying(3),                      -- 担当荷主コード
     is_enabled character varying(1) DEFAULT 'Y' NOT NULL, --退職者用の管理サイン
+    auth_level INT                            NOT NULL DEFAULT 1, -- 権限レベル（1〜99）
     
     -- 監査用共通カラム
     reg_tm timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -17,8 +18,9 @@ CREATE TABLE public.users (
     -- 複合主キー設定
     CONSTRAINT users_pkey PRIMARY KEY (user_id, whs_cd),
     -- フラグのチェック制約
-    CONSTRAINT check_is_enabled CHECK (is_enabled IN ('Y', 'N'))
+    CONSTRAINT check_is_enabled CHECK (is_enabled IN ('Y', 'N')),
+    -- 権限レベルのチェック制約 (例: 1〜99)
+    CONSTRAINT check_auth_level CHECK (auth_level >= 1 AND auth_level <= 99)
 );
 
--- インデックス（ログイン時に高速に検索できるようにする）
 CREATE INDEX idx_users_login ON public.users USING btree (user_id, is_enabled);
